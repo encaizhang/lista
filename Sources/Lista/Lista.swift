@@ -16,31 +16,31 @@ public final class Lista<Value>: Sendable {
     private nonisolated(unsafe) var _tail: Node<Value>?
     private nonisolated(unsafe) var _count: Int
 
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-    private nonisolated(unsafe) var _lock = os_unfair_lock_s()
+    #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        private nonisolated(unsafe) var _lock = os_unfair_lock_s()
 
-    @inline(__always)
-    private func lock() {
-        os_unfair_lock_lock(&_lock)
-    }
+        @inline(__always)
+        private func lock() {
+            os_unfair_lock_lock(&_lock)
+        }
 
-    @inline(__always)
-    private func unlock() {
-        os_unfair_lock_unlock(&_lock)
-    }
-#else
-    private let _lock = NSLock()
+        @inline(__always)
+        private func unlock() {
+            os_unfair_lock_unlock(&_lock)
+        }
+    #else
+        private let _lock = NSLock()
 
-    @inline(__always)
-    private func lock() {
-        _lock.lock()
-    }
+        @inline(__always)
+        private func lock() {
+            _lock.lock()
+        }
 
-    @inline(__always)
-    private func unlock() {
-        _lock.unlock()
-    }
-#endif
+        @inline(__always)
+        private func unlock() {
+            _lock.unlock()
+        }
+    #endif
 
     /// The number of items currently in this list
     public var count: Int {
